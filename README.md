@@ -1,6 +1,9 @@
 # Walkie Talkie - STT/TTS Service Stack
 
 A Docker Compose stack providing unified Speech-to-Text (Whisper) and Text-to-Speech (Kokoro) services with a single API endpoint.
+Note to self: also consider https://hub.docker.com/r/dublok/whisperdock which is much smaller than whisper-asr-webservice
+
+
 
 ## Architecture
 
