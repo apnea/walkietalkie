@@ -24,11 +24,20 @@ services:
   # Kokoro TTS service  
   kokoro:
     container_name: kokoro
-    image: ghcr.io/remsky/kokoro-fastapi-cpu:v0.2.2
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.2.0
+    # this is the last version that works on Pascal GPUs / Cuda 12.4 - later require 12.8
     ports:
       - 8880:8880
     networks:
       - walkietalkie
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
     restart: unless-stopped
   # API Gateway to unify endpoints
   gateway:

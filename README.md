@@ -4,16 +4,16 @@ A Docker Compose stack providing unified Speech-to-Text (Whisper) and Text-to-Sp
 
 ## Architecture
 
-- **Whisper**: STT service using whisperdock (onerahmet/openai-whisper-asr-webservice)
-- **Kokoro**: TTS service using official kokoro-fastapi-cpu image  
+- **Whisper**: STT service using [onerahmet/openai-whisper-asr-webservice](https://ahmetoner.com/whisper-asr-webservice/)
+- **Kokoro**: TTS service using [kokoro-fastapi-cpu image](https://github.com/remsky/Kokoro-FastAPI)
 - **Nginx Gateway**: Unified API endpoint routing requests to appropriate services
 
-2. Start services:
+1. Start services:
 ```bash
 docker compose up -d
 ```
 
-3. Test health:
+2. Test health:
 ```bash
 curl http://localhost:8888/health
 ```
@@ -27,7 +27,7 @@ curl http://localhost:8888/health
 
 ### Direct Service Access
 - **Whisper**: http://localhost:9000 
-- **Kokoro**: http://localhost:8880
+- **Kokoro**: http://localhost:8880  http://localhost:8880/docs  http://localhost:8880/web
 
 ## Usage Examples
 
@@ -42,12 +42,6 @@ curl -X POST http://localhost:8888/tts/v1/audio/speech \
   -H 'Content-Type: application/json'   -d '{"input": "Hello world", "voice": "af_jadzia"}' --output test.mp3
 ```
 
-## Configuration
-
-Edit `.env` file to customize:
-- `ASR_MODEL`: Whisper model size (tiny, base, small, medium, large)
-- `USE_GPU`: Enable GPU support (requires nvidia-docker)
-- Port configurations
 
 ## GPU vs CPU
 
@@ -59,7 +53,7 @@ Edit `.env` file to customize:
 This stack provides standard HTTP endpoints that MCP servers can easily integrate with:
 
 ```python
-# Example MCP server integration
+# Example MCP server integration (check exact API specs for arguments and returns)
 import requests
 
 def transcribe_audio(audio_file_path):
@@ -72,14 +66,9 @@ def transcribe_audio(audio_file_path):
 
 def synthesize_speech(text):
     response = requests.post(
-        'http://localhost:8888/tts/',
-        json={'text': text}
+        'http://localhost:8888/tts/v1/audio/speech',
+        json={'input': text}
     )
     return response.content  # Audio data
 ```
 
-## Troubleshooting
-
-- Check service logs: `docker compose logs [service-name]`
-- Verify GPU access: `docker compose logs whisper`
-- Test individual services using direct ports if gateway issues occur
