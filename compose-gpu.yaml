@@ -1,0 +1,55 @@
+services:
+  # Whisper STT service using whisperdock
+  whisper:
+    container_name: walkietalkie-whisper
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    ports:
+      - "9000:9000"
+    environment:
+      - ASR_MODEL=base
+      - ASR_ENGINE=openai_whisper
+    volumes:
+      - whisper_models:/app/models
+    networks:
+      - walkietalkie
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  # Kokoro TTS service  
+  kokoro:
+    container_name: walkietalkie-kokoro
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:v0.2.2
+    ports:
+      - "8880:8880"
+    networks:
+      - walkietalkie
+    restart: unless-stopped
+
+  # API Gateway to unify endpoints
+  gateway:
+    container_name: walkietalkie-gateway
+    image: nginx:alpine
+    ports:
+      - "8888:80"  # Main unified endpoint
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - whisper
+      - kokoro
+    networks:
+      - walkietalkie
+    restart: unless-stopped
+
+volumes:
+  whisper_models:
+
+networks:
+  walkietalkie:
+    name: walkietalkie
+    driver: bridge
