@@ -38,9 +38,8 @@ curl -X POST -F 'audio_file=@audio.wav' http://localhost:8888/stt/asr
 
 ### Text-to-Speech  
 ```bash
-curl -X POST http://localhost:8888/tts/ \
-  -H 'Content-Type: application/json' \
-  -d '{"text": "Hello world"}'
+curl -X POST http://localhost:8888/tts/v1/audio/speech \
+  -H 'Content-Type: application/json'   -d '{"input": "Hello world", "voice": "af_jadzia"}' --output test.mp3
 ```
 
 ## Configuration
